@@ -16,10 +16,19 @@
     <Filter Include="Source Files\objects">
       <UniqueIdentifier>{469606e5-fdf9-487e-9e7c-5b54d2a6ebcd}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source Files\utils">
+      <UniqueIdentifier>{04f3d409-8b62-4bf6-8990-aa06a591398d}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Main.cpp">
       <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Ball.cpp">
+      <Filter>Source Files\objects</Filter>
+    </ClCompile>
+    <ClCompile Include="DrawUtil.cpp">
+      <Filter>Source Files\utils</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -28,6 +37,9 @@
   <ItemGroup>
     <ClInclude Include="Ball.h">
       <Filter>Source Files\objects</Filter>
+    </ClInclude>
+    <ClInclude Include="DrawUtil.h">
+      <Filter>Source Files\utils</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

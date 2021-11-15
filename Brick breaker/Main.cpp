@@ -1,5 +1,7 @@
 #include <SDL.h>
 #include <iostream>
+#include "DrawUtil.h"
+#include "Ball.h"
 
 bool is_running;
 int state = 1; // state define which is the current process
@@ -10,10 +12,7 @@ SDL_Point window_pos; // heigh and width (using point because rectangle stores 2
 SDL_Window* window = nullptr; // stores window instance
 SDL_Renderer* renderer = nullptr; // store renderer instance
 
-// ball properties
-SDL_Rect ball_pos; // store x y coordinate and height and width
-SDL_Point movement_vectors; // stores x and y between -10 and 10;
-SDL_Color ball_color; // ball color
+Ball* ball = nullptr;
 
 // rneder / process properties
 
@@ -27,19 +26,16 @@ float tps = 30; // might end up being faster (then we will use custom render fra
 int tick_delay = 1000 / tps;
 Uint32 tick_last;
 
-void move() {
-	ball_pos.x += movement_vectors.x;
-	ball_pos.y += movement_vectors.y;
-}
-
 void collision() {
-	int next_x = ball_pos.x + movement_vectors.x;
-	if (next_x < 0 || next_x + ball_pos.w > window_pos.x) {
-		movement_vectors.x = -movement_vectors.x;
+	int next_x = ball->getX() + ball->getVectorX();
+	if (next_x - ball->getRadius() < 0 || next_x + ball->getRadius() > window_pos.x) {
+		//movement_vectors.x = -movement_vectors.x;
+		ball->bounce(0);
 	}
-	int next_y = ball_pos.y + movement_vectors.y;
-	if (next_y < 0 || next_y + ball_pos.h > window_pos.y) {
-		movement_vectors.y = -movement_vectors.y;
+	int next_y = ball->getY() + ball->getVectorY();
+	if (next_y - ball->getRadius() < 0 || next_y + ball->getRadius() > window_pos.y) {
+		//movement_vectors.y = -movement_vectors.y;
+		ball->bounce(90);
 	}
 }
 
@@ -65,7 +61,7 @@ void handleEvents() {
 void update() {
 	switch (state) {
 	case 2:
-		move();
+		ball->move();
 		collision();
 		break;
 	}
@@ -76,8 +72,7 @@ void render() {
 	SDL_RenderClear(renderer);
 
 	// render ball
-	SDL_SetRenderDrawColor(renderer, ball_color.r, ball_color.g, ball_color.b, ball_color.a);
-	SDL_RenderFillRect(renderer, &ball_pos);
+	ball->render(renderer);
 
 	SDL_RenderPresent(renderer);
 }
@@ -116,14 +111,15 @@ int main(int arg, char* args[]) {
 		}
 	}
 
-	// create ball properties
-	ball_pos.w = 10;
-	ball_pos.h = ball_pos.w; // square
-	ball_pos.x = (window_pos.x - ball_pos.w) * 0.5; // 1/2 of window width - the width to be centered
-	ball_pos.y = window_pos.y * 0.75 - 0.5 * ball_pos.h; // 3/4 of window height - the height to be centered
-	movement_vectors.x = 0; // x movement vector
-	movement_vectors.y = 2; // y movement vector
-	ball_color = { 0, 0, 0, 255 }; // black
+	// create ball with properties
+	ball = new Ball(
+		(window_pos.x - 5) * 0.5,      // x pos (centered on the window)
+		window_pos.y * 0.75 - 0.5 * 5, // y pos (centered on the window)
+		5,                             // radius
+		0,                             // vector x
+		2,                             // speed
+		{ 0,0,0,255 }                  // color black
+	);
 
 	while (is_running) {
 		handleEvents();
