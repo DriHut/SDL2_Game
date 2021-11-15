@@ -22,20 +22,22 @@ const int frame_delay = 1000 / fps;
 Uint32 frame_last;
 
 // tick variable
-float tps = 30; // might end up being faster (then we will use custom render frame rate)
+float tps = 120; // might end up being faster (then we will use custom render frame rate)
 int tick_delay = 1000 / tps;
 Uint32 tick_last;
 
 void collision() {
 	int next_x = ball->getX() + ball->getVectorX();
 	if (next_x - ball->getRadius() < 0 || next_x + ball->getRadius() > window_pos.x) {
-		//movement_vectors.x = -movement_vectors.x;
 		ball->bounce(0);
 	}
 	int next_y = ball->getY() + ball->getVectorY();
-	if (next_y - ball->getRadius() < 0 || next_y + ball->getRadius() > window_pos.y) {
-		//movement_vectors.y = -movement_vectors.y;
-		ball->bounce(90);
+	if (next_y - ball->getRadius() < 0) {
+		ball->bounce(1);
+	} else if (next_y + ball->getRadius() > window_pos.y) {
+		state++;
+		ball->bounce(1);
+		std::cout << "Game ended! ..." << std::endl;
 	}
 }
 
@@ -48,9 +50,17 @@ void handleEvents() {
 		is_running = false;
 		break;
 	case SDL_MOUSEBUTTONUP: // check when click finished
-		if (event.button.button == SDL_BUTTON_LEFT && state == 1) {
-			std::cout << "Game started ! ..." << std::endl;
-			state++; // exist the waiting menu state
+		if (event.button.button == SDL_BUTTON_LEFT) {
+			switch (state) {
+			case 1:
+				std::cout << "Game started ! ..." << std::endl;
+				state++; // exit the waiting menu state
+				break;
+			case 3:
+				std::cout << "Game restarted ! ..." << std::endl;
+				state = 1; // restart to the waiting menu
+				break;
+			}
 		}
 		break;
 	default:
@@ -90,8 +100,8 @@ int main(int arg, char* args[]) {
 	if (SDL_Init(SDL_INIT_EVERYTHING) == 0) {
 		std::cout << "Video and events Initialised!..." << std::endl;
 
-		window_pos.x = 600; // window width
-		window_pos.y = 400; // window height
+		window_pos.x = 1280; // window width
+		window_pos.y = 720; // window height
 		window = SDL_CreateWindow("Brick breaker", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, window_pos.x, window_pos.y, SDL_WINDOW_SHOWN);
 		if (window) {
 			std::cout << "window created!..." << std::endl;
@@ -116,8 +126,8 @@ int main(int arg, char* args[]) {
 		(window_pos.x - 5) * 0.5,      // x pos (centered on the window)
 		window_pos.y * 0.75 - 0.5 * 5, // y pos (centered on the window)
 		5,                             // radius
-		0,                             // vector x
-		2,                             // speed
+		0.4,                           // vector x
+		1,                             // speed
 		{ 0,0,0,255 }                  // color black
 	);
 
