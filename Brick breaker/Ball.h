@@ -15,6 +15,7 @@ private:
 	float vec_y; // stores y between -1 and 1;
 
 	SDL_Color color; // ball color
+	bool is_thrown = false; // get if ball has been launched 
 public:
 	Ball(float x, float y, int radius, float vector_x, float speed, SDL_Color ball_color);
 	~Ball();
@@ -40,4 +41,7 @@ public:
 	void setSpeed(float speed);
 
 	void render(SDL_Renderer* renderer);
+
+	bool isThrown() { return is_thrown; };
+	void setThrown(bool is_thrown);
 };

@@ -1,42 +1,97 @@
 #include <SDL.h>
+#include <SDL_image.h>
 #include <iostream>
 #include <vector>
 #include "DrawUtil.h"
 #include "Window.h"
 #include "Block.h"
+#include "Pusher.h"
 #include "Ball.h"
+#include "Keyboard.h"
 
 using std::vector;
 
-bool is_running;
+bool is_running; // is game running 
+int level = 1; // current loaded level
 int state = 1; // state define which is the current process
-Window* window = nullptr;
+Window* window = nullptr; // store multiple variables relative to the window
+Keyboard* keyboard = nullptr; // stores all key states
+
+bool released = true; // save for pause button state
+bool paused; // paused state
 
 Ball* ball = nullptr; // main ball
 //vector<Ball*> balls; // power balls
-int level = 1;
 
-//SDL_Rect collidable;
-Block* block = nullptr;
+vector<Block*> blocks; // blocks list
+SDL_Point block_Size;
+
+Pusher* pusher = nullptr;
+
+// not clean implementation
+SDL_Texture* title = nullptr;
+SDL_Texture* pause = nullptr;
+SDL_Texture* end = nullptr;
 
 void init() {
+	ball->setPos(
+		pusher->getX() + 0.5 * pusher->getWidth(),
+		pusher->getY() - 0.5 * pusher->getHeight() - ball->getRadius()
+	);
+	ball->setSpeed(0.5);
+	ball->setThrown(false);
+
+	block_Size.x = 50;
+	block_Size.y = 25;
+
+	// draw start image
+	SDL_Surface* tmp = IMG_Load("assets/Start_screen.png");
+	title = SDL_CreateTextureFromSurface(window->getRenderer(), tmp);
+	// draw pause image
+	tmp = IMG_Load("assets/Pause_screen.png");
+	pause = SDL_CreateTextureFromSurface(window->getRenderer(), tmp);
+	// draw end image
+	tmp = IMG_Load("assets/End_screen.png");
+	end = SDL_CreateTextureFromSurface(window->getRenderer(), tmp);
+	SDL_FreeSurface(tmp); // unload the surface
+
 	switch (level) {
-	case 1:
-		ball->setPos(window->getPos().x * 0.5, window->getPos().y * 0.75);
-		ball->setSpeed(0.5);
-		ball->setVectors(0);
+	case 1: // level 1
+		// set blocks
+		/*block = new Block(
+			(window->getPos().x - block_Size.x) * 0.5, // x pos
+			(window->getPos().y - block_Size.y) * 0.5, // y pos
+			block_Size.x,                              // width
+			block_Size.y,                              // height
+			5                                // hardness / level 
+		);
+		blocks.push_back(block);*/
+
+		for (int j = 0; j < 7; j++) {
+			for (int i = -6; i < 6; i++) {
+				blocks.push_back(new Block((window->getPos().x - block_Size.x) * 0.5 + i * (block_Size.x+1), (window->getPos().y - block_Size.y) * 0.5 - j * (block_Size.y + 1), block_Size.x, block_Size.y, 7 - j));
+			}
+		}
 		break;
 	}
 }
 
 void clear() {
 	//balls.clear();
+	for (Block* block : blocks) {
+		delete block;
+	}
+	blocks.clear();
 }
 
 void collide(Ball* ball) {
-	if (block->collision(ball) && block->getLevel() < 0) {
-		delete block;
+	for (int i = 0; i < blocks.size(); i++) {
+		if (blocks[i]->collision(ball) && blocks[i]->getLevel() < 0) {
+			blocks.erase(blocks.begin()+i);
+			return; // only one colision considered
+		}
 	}
+	pusher->collision(ball);
 }
 
 void handleEvents() {
@@ -63,23 +118,74 @@ void handleEvents() {
 			}
 		}
 		break;
-	default:
+	case SDL_KEYUP:
+	case SDL_KEYDOWN:
+		keyboard->updateKey(event.key.keysym.sym, event.key.state);
+		break;
+	case SDL_MOUSEWHEEL:
+		if (!paused) {
+			pusher->setSpeed(pusher->getSpeed() + event.wheel.y * 0.1);
+			std::cout << "speed: " << pusher->getSpeed() << std::endl;
+		}
 		break;
 	}
 }
 
 void update() {
+
 	switch (state) {
-	case 2:
-		ball->move();
-		if (window->stopCollide(ball)) {
-			state++;
-			break;
+	case 2: // running state
+		if (blocks.size() == 0) {
+			state++; // really quick way to detect end condition
 		}
-		if (!window->collide(ball)) {
-			collide(ball);
+
+		// handle pause
+		if (keyboard->getKey(SDLK_p) && released) {
+			paused = !paused;
+			released = false;
+		}
+		else if (!keyboard->getKey(SDLK_p) && !released) {
+			released = true;
+		}
+		if (paused) { return; }
+
+		if (ball->isThrown()) {
+			ball->move(); // move ball
+
+			// check for collisions
+			if (window->stopCollide(ball)) {
+				state++;
+				break;
+			}
+			if (!window->collide(ball)) {
+				collide(ball);
+			}
+		} else {
+			ball->setPos(
+				pusher->getX() + 0.5 * pusher->getWidth(),
+				pusher->getY() - 0.5 * pusher->getHeight() - ball->getRadius()
+			);
+			// determine throwing direction (unfinished)
+			int x_mouse, y_mouse;
+			SDL_GetGlobalMouseState(&x_mouse, &y_mouse);
+
+			int  vect_x = abs(ball->getX() - x_mouse);
+			int  vect_y = abs(ball->getY() - y_mouse);
+
+			if (keyboard->getKey(SDLK_SPACE)) {
+				ball->setThrown(true);
+				ball->setVectors(-0.2); // since unfinished give a magic value :(
+			}
 		}
 		break;
+	}
+
+	// pusher movement
+	if (keyboard->getKey(SDLK_q) && pusher->getX() - pusher->getSpeed() > 0) { // fast moves
+		pusher->setX(pusher->getX() - pusher->getSpeed());
+	}
+	else if (keyboard->getKey(SDLK_d) && pusher->getX() + pusher->getSpeed() + pusher->getWidth() < window->getPos().x) {
+		pusher->setX(pusher->getX() + pusher->getSpeed());
 	}
 }
 
@@ -89,9 +195,29 @@ void render() {
 	SDL_SetRenderDrawColor(renderer, background_color.r, background_color.g, background_color.b, background_color.a); // reset background everytime
 	SDL_RenderClear(renderer);
 
-	// render ball
-	ball->render(renderer);
-	block->render(renderer);
+	// draw pusher at any time
+	pusher->render(renderer);
+
+	// render all the objects
+	switch (state) {
+	case 1:
+		SDL_RenderCopy(renderer, title, NULL, NULL);
+		break;
+	case 2:
+		// render all the blocks
+		for (int i = 0; i < blocks.size(); i++) {
+			blocks[i]->render(renderer);
+		}
+		ball->render(renderer);
+
+		if (paused) {
+			SDL_RenderCopy(renderer, pause, NULL, NULL);
+		}
+		break;
+	case 3:
+		SDL_RenderCopy(renderer, end, NULL, NULL);
+		break;
+	}
 
 	SDL_RenderPresent(renderer);
 }
@@ -127,22 +253,32 @@ int main(int arg, char* args[]) {
 			1280,                   // width
 			720,                    // height
 			SDL_WINDOW_SHOWN,       // tags
-			{ 255, 255, 255, 255 }  // color
+			{ 50, 50, 50, 255 }     // color
 		);
+		keyboard = new Keyboard();
 	}
 
-	// set test block
-	block = new Block((window->getPos().x - 20) * 0.5, (window->getPos().y - 10) * 0.5, 20, 10, 5);
+	// set pusher
+	pusher = new Pusher(
+		(window->getPos().x - 50) * 0.5, // x pos
+		window->getPos().y - 50,         // y pos
+		50,                              // width
+		5,                               // height
+		{ 255, 255, 255, 255 },          // color
+		1.0                              // speed
+	);
 
 	// create ball with properties
 	ball = new Ball(
-		window->getPos().x * 0.5,  // x pos (centered on the window)
-		window->getPos().y * 0.75, // y pos (centered on the window)
+		pusher->getX() + 0.5 * pusher->getWidth(),      // x pos (centered on the pusher)
+		pusher->getY() - 0.5 * pusher->getHeight() - 5, // y pos (on top of the pusher)
 		5,                         // radius
 		0,                         // vector x
 		0.5,                       // speed
-		{ 0,0,0,255 }              // color black
+		{ 255,255,255,255 }        // color white
 	);
+
+	init();
 
 	while (is_running) {
 		handleEvents();

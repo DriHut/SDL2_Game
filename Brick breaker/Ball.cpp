@@ -86,3 +86,7 @@ void Ball::render(SDL_Renderer* renderer) {
 	SDL_SetRenderDrawColor(renderer, color.r, color.g, color.b, color.a);
 	DrawUtil::SDL_RenderFillCircle(renderer, (int)pos_x, (int)pos_y, radius);
 }
+
+void Ball::setThrown(bool is_thrown) {
+	this->is_thrown = is_thrown;
+}

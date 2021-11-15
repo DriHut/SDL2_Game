@@ -15,12 +15,19 @@ Window::Window(const char* title, int x, int y, int width, int height, Uint32 fl
 
 	renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED);
 	if (renderer) {
-		SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
 		std::cout << "renderer created!..." << std::endl;
 	}
 	else {
 		std::cerr << "/!\\Couldn't create render!..." << std::endl;
 	}
+
+	//load font :!\ doesn't work on my IDE sadly
+	/*if (TTF_Init()) {
+		std::cout << "ttf library initialised created!..." << std::endl;
+	}
+	else {
+		std::cerr << "/!\\Couldn't init fonts!..." << std::endl;
+	}*/
 	this->background_color = background_color;
 }
 
