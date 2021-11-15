@@ -36,6 +36,9 @@
     <ClCompile Include="Block.cpp">
       <Filter>Source Files\objects</Filter>
     </ClCompile>
+    <ClCompile Include="Collidable.cpp">
+      <Filter>Source Files\utils</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
@@ -54,6 +57,9 @@
       <Filter>Source Files\objects</Filter>
     </ClInclude>
     <ClInclude Include="Colors.h">
+      <Filter>Source Files\utils</Filter>
+    </ClInclude>
+    <ClInclude Include="Collidable.h">
       <Filter>Source Files\utils</Filter>
     </ClInclude>
   </ItemGroup>

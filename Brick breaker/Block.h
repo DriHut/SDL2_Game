@@ -1,11 +1,10 @@
 #pragma once
 
 #include <SDL.h>
-#include "Ball.h"
+#include "Collidable.h"
 
-class Block {
+class Block : public Collidable {
 private :
-	SDL_Rect collision_box;
 	int level;
 public:
 	Block(int x, int y, int w, int h, int level);
@@ -14,8 +13,6 @@ public:
 	void render(SDL_Renderer* renderer);
 
 	bool collision(Ball* ball);
-
-	int collide(int pos_x, int pos_y, int radius);
 
 	int getLevel() { return level; };
 };

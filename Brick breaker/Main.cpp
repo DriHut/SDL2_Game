@@ -13,7 +13,7 @@ int state = 1; // state define which is the current process
 Window* window = nullptr;
 
 Ball* ball = nullptr; // main ball
-//vector<Ball*> balls; // power up balls
+//vector<Ball*> balls; // power balls
 int level = 1;
 
 //SDL_Rect collidable;
