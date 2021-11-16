@@ -34,7 +34,8 @@ Window::Window(const char* title, int x, int y, int width, int height, Uint32 fl
 }
 
 Window::~Window() {
-	delete window, renderer;
+	SDL_DestroyWindow(window);
+	SDL_DestroyRenderer(renderer);
 }
 
 bool Window::collide(Ball* ball) { // get when colliding with borders
