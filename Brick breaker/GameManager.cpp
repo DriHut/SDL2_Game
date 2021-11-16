@@ -1,5 +1,8 @@
 #include "GameManager.h"
 
+#include <stdlib.h>
+#include <time.h>
+#include <stdio.h>
 #include <SDL_image.h>
 #include <iostream>
 #include "DrawUtil.h"
@@ -24,7 +27,7 @@ GameManager::GameManager(const char* title, int width, int height, SDL_Color bac
 
 GameManager::~GameManager() {
 	clear();
-	delete window, keyboard, pusher, ball, title, pause, end;
+	delete window, keyboard, pusher, ball, font64, pause_label;
 }
 
 void GameManager::init(int pusher_size, int ball_radius, SDL_Color main_color) {
@@ -44,37 +47,60 @@ void GameManager::init(int pusher_size, int ball_radius, SDL_Color main_color) {
 		pusher->getY() - 0.5 * pusher->getHeight() - 5, // y pos (on top of the pusher)
 		ball_radius,               // radius
 		0,                         // vector x
-		0.5,                       // speed
+		0.7,                       // speed
 		main_color                 // color white
 	);
+
+	// create cool looking ball menu
+	int max_x = window->getSize().x;
+	int max_y = window->getSize().y;
+
+	float speed;
+	int radius;
+	for (int i = 0; i < 15; i++) {
+		speed = random(0.5, 2);
+		radius = (int)random(3, 15);
+		menu_balls.push_back(new Ball((int)random(radius+1,max_x-radius-1), (int)random(radius+1, max_y-radius-1), radius, random(speed), speed, main_color));
+	}
 
 	// general block size parameters
 	block_Size.x = 50;
 	block_Size.y = 25;
 
-	// draw start image
-	SDL_Surface* tmp = IMG_Load("assets/Start_screen.png");
-	title = SDL_CreateTextureFromSurface(window->getRenderer(), tmp);
-	// draw pause image
-	tmp = IMG_Load("assets/Pause_screen.png");
-	pause = SDL_CreateTextureFromSurface(window->getRenderer(), tmp);
-	// draw end image
-	tmp = IMG_Load("assets/End_screen.png");
-	end = SDL_CreateTextureFromSurface(window->getRenderer(), tmp);
-	SDL_FreeSurface(tmp); // unload the surface
-
-	font = TTF_OpenFont("assets/fonts/playmegames-reguler.ttf", 16);
-	if (!font) {
-		std::cerr << "/!\\Couldn't init font!..." << std::endl;
+	font64 = TTF_OpenFont("assets/fonts/playmegames-reguler.ttf", 64);
+	font32 = TTF_OpenFont("assets/fonts/playmegames-reguler.ttf", 32);
+	if (!font64 && !font32) {
+		std::cerr << "/!\\Couldn't init main font!..." << std::endl;
 	}
 	else {
-		std::cout << "Font loaded correctly!..." << std::endl;
+		std::cout << "Main font loaded correctly!..." << std::endl;
 	}
 
-	title_label = new Label("test", font, { 255,255,255,255 }, window->getRenderer());
+	// pause label
+	pause_label = new Label("Pause", 60, 10, font64, { 255,255,255,255 }, window->getRenderer());
+	pause_info = new Label("Press <p> to unpause", window->getSize().x - 300, window->getSize().y - 40, font32, { 255,255,255,255 }, window->getRenderer());
+
+	lost_label = new Label("You Lost", 500, window->getSize().y / 2 + 100, font64, { 255,255,255,255 }, window->getRenderer());
+	win_label  = new Label("You Win",  500, window->getSize().y / 2 + 100, font64, { 255,255,255,255 }, window->getRenderer());
+
+	// create a title using a font that will get unloaded
+	TTF_Font* temp_font = TTF_OpenFont("assets/fonts/playmegames-reguler.ttf", 256);
+	title_label.push_back( new Label("Brick", 150, 100, temp_font, { 255,255,255,255 }, window->getRenderer()) );
+	title_label.push_back( new Label("Breaker", 250, 300, temp_font, { 255,255,255,255 }, window->getRenderer()) );
+	title_label.push_back( new Label("B", 150, 100, temp_font, { 204,204,0,255 }, window->getRenderer()) );
+	title_label.push_back( new Label("B", 250, 300, temp_font, { 204,0,0,255 }, window->getRenderer()) );
+	TTF_CloseFont(temp_font);
 }
 
 void GameManager::clear() {
+	clearBlocks();
+	for (Label* label : title_label) {
+		delete label;
+	}
+	title_label.clear();
+}
+
+void GameManager::clearBlocks() {
 	for (Block* block : blocks) {
 		delete block;
 	}
@@ -87,11 +113,11 @@ void GameManager::loadLevel(int level) {
 		pusher->getX() + 0.5 * pusher->getWidth(),
 		pusher->getY() - 0.5 * pusher->getHeight() - ball->getRadius()
 	);
-	ball->setSpeed(0.5);
+	ball->setSpeed(0.7);
 	ball->setThrown(false);
 
 	//clear all the blocks
-	clear();
+	clearBlocks();
 
 	switch (level) {
 	case 1: // level 1
@@ -167,9 +193,17 @@ void GameManager::handleEvents() {
 void GameManager::update() {
 
 	switch (state) {
+	case 1:// in the menu
+		for (Ball* b : menu_balls) {
+			b->move(); // move ball
+			if (!window->collide(b)) {
+				collide(b);
+			}
+		}
+		break;
 	case 2: // running state
 		if (blocks.size() == 0) {
-			state++; // really quick way to detect end condition
+			state = 4; // really quick way to detect victory state
 		}
 
 		// handle pause
@@ -187,14 +221,13 @@ void GameManager::update() {
 
 			// check for collisions
 			if (window->stopCollide(ball)) {
-				state++;
+				state++; // loose state
 				break;
 			}
 			if (!window->collide(ball)) {
 				collide(ball);
 			}
-		}
-		else {
+		} else {
 			ball->setPos(
 				pusher->getX() + 0.5 * pusher->getWidth(),
 				pusher->getY() - 0.5 * pusher->getHeight() - ball->getRadius()
@@ -234,7 +267,7 @@ void GameManager::update() {
 	}
 
 	// pusher movement
-	if (keyboard->getKey(SDLK_q) && pusher->getX() - pusher->getSpeed() > 0) { // fast moves
+	if ((keyboard->getKey(SDLK_q) || keyboard->getKey(SDLK_a)) && pusher->getX() - pusher->getSpeed() > 0) {
 		pusher->setX(pusher->getX() - pusher->getSpeed());
 	}
 	else if (keyboard->getKey(SDLK_d) && pusher->getX() + pusher->getSpeed() + pusher->getWidth() < window->getSize().x) {
@@ -251,13 +284,25 @@ void GameManager::render() {
 	// draw pusher at any time
 	pusher->render(renderer);
 
-	title_label->render(renderer);
-
 	// render all the objects
 	switch (state) {
 	case 1:
-		SDL_RenderCopy(renderer, title, NULL, NULL);
+		// nice looking bouncing balls
+		for (Ball* b : menu_balls) {
+			b->render(renderer);
+		}
+		// render all the title labels (for nice looking)
+		for (Label* label : title_label) {
+			label->render(renderer);
+		}
 		break;
+	case 4:
+	case 3: // win or lose cases
+		if (state == 4) {
+			win_label->render(renderer);
+		} else {
+			lost_label->render(renderer);
+		}
 	case 2:
 		// render all the blocks
 		for (int i = 0; i < blocks.size(); i++) {
@@ -265,18 +310,25 @@ void GameManager::render() {
 		}
 
 		if (!ball->isThrown()) {
-			SDL_SetRenderDrawColor(renderer, 255, 0, 0, 255); // reset background everytime
-
+			SDL_SetRenderDrawColor(renderer, 120, 120, 120, 255); // reset background everytime
+			
 			SDL_RenderDrawLine(renderer, ball->getX(), ball->getY(), cursor.x, cursor.y);
 		}
 		ball->render(renderer);
 
 		if (paused) {
-			SDL_RenderCopy(renderer, pause, NULL, NULL);
+			SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
+
+			SDL_Rect rect{ 12, 11, 15, 41 };
+			SDL_Rect rect_2{ 37, 11, 15, 41 };
+			SDL_RenderFillRect(renderer, &rect);
+			SDL_RenderFillRect(renderer, &rect_2);
+
+			pause_label->render(renderer);
+			pause_info->render(renderer);
 		}
 		break;
-	case 3:
-		SDL_RenderCopy(renderer, end, NULL, NULL);
+		//SDL_RenderCopy(renderer, end, NULL, NULL);
 		break;
 	}
 
@@ -288,4 +340,13 @@ void GameManager::clean() {
 	SDL_Quit();
 
 	std::cout << "Game renderer cleaned!..." << std::endl;
+}
+
+float GameManager::random(float max) {
+	return random(0,max);
+}
+
+float GameManager::random(float min, float max) {
+	float r = min + static_cast <float> (rand()) / (static_cast <float> (RAND_MAX / (max - min)));
+	return r;
 }

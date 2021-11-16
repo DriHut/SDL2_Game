@@ -9,7 +9,7 @@ private :
 	SDL_Rect destination;
 	SDL_Texture* texture;
 public :
-	Label(const char* text, TTF_Font* font, SDL_Color color, SDL_Renderer* renderer);
+	Label(const char* text, int x, int y, TTF_Font* font, SDL_Color color, SDL_Renderer* renderer);
 	~Label();
 
 	void setTexture(const char* text, TTF_Font* font, SDL_Color color, SDL_Renderer* renderer);

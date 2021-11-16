@@ -1,6 +1,8 @@
 #include "Label.h"
 
-Label::Label(const char* text, TTF_Font* font, SDL_Color color, SDL_Renderer* renderer) {
+Label::Label(const char* text, int x, int y, TTF_Font* font, SDL_Color color, SDL_Renderer* renderer) {
+	destination.x = x;
+	destination.y = y;
 	setTexture(text, font, color, renderer);
 }
 
@@ -18,8 +20,6 @@ void Label::setTexture(const char* text, TTF_Font* font, SDL_Color color, SDL_Re
 	source.h = tmp->h;
 	
 	// set destination box coordinate
-	destination.x = 10;
-	destination.y = 10;
 	destination.w = source.w;
 	destination.h = source.h;
 

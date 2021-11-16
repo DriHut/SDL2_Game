@@ -34,19 +34,22 @@ private:
 	SDL_Point cursor;
 
 	// Labels
-	Label* title_label = nullptr;
+	TTF_Font* font64 = nullptr;
+	TTF_Font* font32 = nullptr;
+	vector<Label*> title_label;
+	Label* pause_label = nullptr;
+	Label* pause_info = nullptr;
+	Label* lost_label = nullptr;
+	Label* win_label = nullptr;
 
-	// Textures (not clean implementation)
-	TTF_Font* font = nullptr;
-	SDL_Texture* title = nullptr;
-	SDL_Texture* pause = nullptr;
-	SDL_Texture* end = nullptr;
+	vector<Ball*> menu_balls; // menu balls
 public :
 	GameManager(const char* title, int width, int height, SDL_Color background_color);
 	~GameManager();
 
 	void init(int pusher_size, int ball_radius, SDL_Color main_color);
 	void clear();
+	void clearBlocks();
 
 	void loadLevel(int level);
 
@@ -59,4 +62,7 @@ public :
 	void clean();
 
 	bool isRunning() { return is_running; };
+
+	float random(float max);
+	float random(float min, float max);
 };

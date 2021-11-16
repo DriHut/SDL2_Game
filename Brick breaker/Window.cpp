@@ -47,7 +47,7 @@ bool Window::collide(Ball* ball) { // get when colliding with borders
 		collided =  true;
 	}
 	int next_y = ball->getY() + ball->getVectorY();
-	if (next_y - ball->getRadius() < 0) {
+	if (next_y - ball->getRadius() < 0 || next_y + ball->getRadius() > box.h) {
 		ball->bounce(1);
 		collided =  true;
 	}
