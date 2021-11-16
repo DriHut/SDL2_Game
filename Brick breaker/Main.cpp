@@ -13,9 +13,9 @@ Uint32 tick_last;
 GameManager* game = nullptr;
 
 int main(int arg, char* args[]) {
-	game = new GameManager("Brick Breaker", 50, 5, 1280, 720, { 50, 50, 50, 255 }, {255, 255, 255, 255});
+	game = new GameManager("Brick Breaker", 1280, 720, { 50, 50, 50, 255 });
 
-	game->init();
+	game->init( 50, 5, { 255, 255, 255, 255 });
 
 	while (game->isRunning()) {
 		game->handleEvents();

@@ -48,6 +48,9 @@
     <ClCompile Include="GameManager.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="Label.cpp">
+      <Filter>Source Files\objects</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
@@ -79,6 +82,9 @@
     </ClInclude>
     <ClInclude Include="GameManager.h">
       <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Label.h">
+      <Filter>Source Files\objects</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

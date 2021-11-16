@@ -4,7 +4,7 @@
 #include <iostream>
 #include "DrawUtil.h"
 
-GameManager::GameManager(const char* title, int pusher_size, int ball_radius, int width, int height, SDL_Color background_color, SDL_Color main_color) {
+GameManager::GameManager(const char* title, int width, int height, SDL_Color background_color) {
 	if (SDL_Init(SDL_INIT_EVERYTHING) == 0) {
 		std::cout << "Video and events Initialised!..." << std::endl;
 		is_running = true;
@@ -20,7 +20,14 @@ GameManager::GameManager(const char* title, int pusher_size, int ball_radius, in
 		);
 		keyboard = new Keyboard();
 	}
+}
 
+GameManager::~GameManager() {
+	clear();
+	delete window, keyboard, pusher, ball, title, pause, end;
+}
+
+void GameManager::init(int pusher_size, int ball_radius, SDL_Color main_color) {
 	// set pusher
 	pusher = new Pusher(
 		(window->getSize().x - 50) * 0.5, // x pos
@@ -40,14 +47,7 @@ GameManager::GameManager(const char* title, int pusher_size, int ball_radius, in
 		0.5,                       // speed
 		main_color                 // color white
 	);
-}
 
-GameManager::~GameManager() {
-	clear();
-	delete window, keyboard, pusher, ball, title, pause, end;
-}
-
-void GameManager::init() {
 	// general block size parameters
 	block_Size.x = 50;
 	block_Size.y = 25;
@@ -62,6 +62,16 @@ void GameManager::init() {
 	tmp = IMG_Load("assets/End_screen.png");
 	end = SDL_CreateTextureFromSurface(window->getRenderer(), tmp);
 	SDL_FreeSurface(tmp); // unload the surface
+
+	font = TTF_OpenFont("assets/fonts/playmegames-reguler.ttf", 16);
+	if (!font) {
+		std::cerr << "/!\\Couldn't init font!..." << std::endl;
+	}
+	else {
+		std::cout << "Font loaded correctly!..." << std::endl;
+	}
+
+	title_label = new Label("test", font, { 255,255,255,255 }, window->getRenderer());
 }
 
 void GameManager::clear() {
@@ -240,6 +250,8 @@ void GameManager::render() {
 
 	// draw pusher at any time
 	pusher->render(renderer);
+
+	title_label->render(renderer);
 
 	// render all the objects
 	switch (state) {

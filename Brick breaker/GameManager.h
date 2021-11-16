@@ -1,11 +1,13 @@
 #pragma once
 #include <SDL.h>
+#include <SDL_ttf.h>
 #include <vector>
 #include "Window.h"
 #include "Block.h"
 #include "Pusher.h"
 #include "Ball.h"
 #include "Keyboard.h"
+#include "Label.h"
 
 using std::vector;
 
@@ -31,15 +33,19 @@ private:
 	vector<Block*> blocks; // blocks list
 	SDL_Point cursor;
 
+	// Labels
+	Label* title_label = nullptr;
+
 	// Textures (not clean implementation)
+	TTF_Font* font = nullptr;
 	SDL_Texture* title = nullptr;
 	SDL_Texture* pause = nullptr;
 	SDL_Texture* end = nullptr;
 public :
-	GameManager(const char* title, int pusher_size, int ball_radius, int width, int height, SDL_Color background_color, SDL_Color main_color);
+	GameManager(const char* title, int width, int height, SDL_Color background_color);
 	~GameManager();
 
-	void init();
+	void init(int pusher_size, int ball_radius, SDL_Color main_color);
 	void clear();
 
 	void loadLevel(int level);

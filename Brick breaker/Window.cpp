@@ -1,5 +1,6 @@
 #include "Window.h"
 #include <iostream>
+#include <SDL_ttf.h>
 
 Window::Window(const char* title, int x, int y, int width, int height, Uint32 flags, SDL_Color background_color) {
 	box.x = x; // window x
@@ -23,19 +24,19 @@ Window::Window(const char* title, int x, int y, int width, int height, Uint32 fl
 		std::cerr << "/!\\Couldn't create render!..." << std::endl;
 	}
 
-	//load font :!\ doesn't work on my IDE sadly
-	/*if (TTF_Init()) {
-		std::cout << "ttf library initialised created!..." << std::endl;
-	}
-	else {
+	if (!TTF_WasInit() && TTF_Init() == -1) {
 		std::cerr << "/!\\Couldn't init fonts!..." << std::endl;
-	}*/
+	} else {
+		std::cout << "TTF correctly initialised!..." << std::endl;
+	}
+
 	this->background_color = background_color;
 }
 
 Window::~Window() {
 	SDL_DestroyWindow(window);
 	SDL_DestroyRenderer(renderer);
+	TTF_Quit();
 }
 
 bool Window::collide(Ball* ball) { // get when colliding with borders
