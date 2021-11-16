@@ -27,6 +27,7 @@ vector<Block*> blocks; // blocks list
 SDL_Point block_Size;
 
 Pusher* pusher = nullptr;
+SDL_Point cursor;
 
 // not clean implementation
 SDL_Texture* title = nullptr;
@@ -69,7 +70,7 @@ void init() {
 
 		for (int j = 0; j < 7; j++) {
 			for (int i = -6; i < 6; i++) {
-				blocks.push_back(new Block((window->getPos().x - block_Size.x) * 0.5 + i * (block_Size.x+1), (window->getPos().y - block_Size.y) * 0.5 - j * (block_Size.y + 1), block_Size.x, block_Size.y, 7 - j));
+				blocks.push_back(new Block((window->getSize().x - block_Size.x) * 0.5 + i * (block_Size.x+1), (window->getSize().y - block_Size.y) * 0.5 - j * (block_Size.y + 1), block_Size.x, block_Size.y, 6 - j));
 			}
 		}
 		break;
@@ -166,16 +167,34 @@ void update() {
 				pusher->getY() - 0.5 * pusher->getHeight() - ball->getRadius()
 			);
 			// determine throwing direction (unfinished)
-			int x_mouse, y_mouse;
-			SDL_GetGlobalMouseState(&x_mouse, &y_mouse);
+			int x, y;
+			SDL_GetGlobalMouseState(&cursor.x, &cursor.y);
+			SDL_GetWindowPosition(window->getWindow(), &x, &y);
 
-			int  vect_x = abs(ball->getX() - x_mouse);
-			int  vect_y = abs(ball->getY() - y_mouse);
+			// normalize cursor position relatively to the window
+			cursor.x -= x;
+			cursor.y -= y;
+
+			// get vectors
+			int  vect_x;
+			if (cursor.y < ball->getY()) {
+				vect_x = cursor.x - ball->getX();
+			} else {
+				vect_x = ball->getX() - cursor.x;
+			}
+			int  vect_y = -abs(ball->getY() - cursor.y);
+
+			float length = sqrt(vect_x * vect_x + vect_y * vect_y);
+			float speed = ball->getSpeed();
 
 			if (keyboard->getKey(SDLK_SPACE)) {
 				ball->setThrown(true);
-				ball->setVectors(-0.2); // since unfinished give a magic value :(
+				ball->setVectors(vect_x * (speed / length));
 			}
+
+			// factor to render a line that is long enough
+			cursor.x = ball->getX() + vect_x * (speed * 80 / length);
+			cursor.y = ball->getY() + vect_y * (speed * 80 / length);
 		}
 		break;
 	}
@@ -184,7 +203,7 @@ void update() {
 	if (keyboard->getKey(SDLK_q) && pusher->getX() - pusher->getSpeed() > 0) { // fast moves
 		pusher->setX(pusher->getX() - pusher->getSpeed());
 	}
-	else if (keyboard->getKey(SDLK_d) && pusher->getX() + pusher->getSpeed() + pusher->getWidth() < window->getPos().x) {
+	else if (keyboard->getKey(SDLK_d) && pusher->getX() + pusher->getSpeed() + pusher->getWidth() < window->getSize().x) {
 		pusher->setX(pusher->getX() + pusher->getSpeed());
 	}
 }
@@ -207,6 +226,12 @@ void render() {
 		// render all the blocks
 		for (int i = 0; i < blocks.size(); i++) {
 			blocks[i]->render(renderer);
+		}
+
+		if (!ball->isThrown()) {
+			SDL_SetRenderDrawColor(renderer, 255, 0, 0, 255); // reset background everytime
+
+			SDL_RenderDrawLine(renderer, ball->getX(), ball->getY(), cursor.x, cursor.y);
 		}
 		ball->render(renderer);
 
@@ -260,8 +285,8 @@ int main(int arg, char* args[]) {
 
 	// set pusher
 	pusher = new Pusher(
-		(window->getPos().x - 50) * 0.5, // x pos
-		window->getPos().y - 50,         // y pos
+		(window->getSize().x - 50) * 0.5, // x pos
+		window->getSize().y - 50,         // y pos
 		50,                              // width
 		5,                               // height
 		{ 255, 255, 255, 255 },          // color

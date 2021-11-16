@@ -37,7 +37,7 @@ public:
 
 	void bounce(int angle);
 
-	int getSpeed();
+	float getSpeed();
 	void setSpeed(float speed);
 
 	void render(SDL_Renderer* renderer);

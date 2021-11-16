@@ -71,7 +71,7 @@ void Ball::bounce(int angle) {
 	}
 }
 
-int Ball::getSpeed() {
+float Ball::getSpeed() {
 	return speed;
 }
 
