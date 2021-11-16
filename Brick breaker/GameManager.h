@@ -42,7 +42,9 @@ private:
 	Label* lost_label = nullptr;
 	Label* win_label = nullptr;
 
+	// menu graphics
 	vector<Ball*> menu_balls; // menu balls
+	vector<Block*> menu_blocks; // menu blocks
 public :
 	GameManager(const char* title, int width, int height, SDL_Color background_color);
 	~GameManager();

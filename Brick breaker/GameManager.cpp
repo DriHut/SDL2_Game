@@ -62,6 +62,13 @@ void GameManager::init(int pusher_size, int ball_radius, SDL_Color main_color) {
 		radius = (int)random(3, 15);
 		menu_balls.push_back(new Ball((int)random(radius+1,max_x-radius-1), (int)random(radius+1, max_y-radius-1), radius, random(speed), speed, main_color));
 	}
+	
+	// create Blocks for the menu
+	int length;
+	for (int i = 0; i < 10; i++) {
+		length = (int)random(20, 50);
+		menu_blocks.push_back(new Block((int)random(length + 1, max_x - length - 1), (int)random(length / 2 + 1, max_y - length / 2 - 1), length, length / 2, (int)random(5)));
+	}
 
 	// general block size parameters
 	block_Size.x = 50;
@@ -194,10 +201,26 @@ void GameManager::update() {
 
 	switch (state) {
 	case 1:// in the menu
+
+		// funny graphics in the background
 		for (Ball* b : menu_balls) {
 			b->move(); // move ball
 			if (!window->collide(b)) {
 				collide(b);
+				for (int i = 0; i < menu_blocks.size(); i++) {
+					if (menu_blocks[i]->collision(b) && menu_blocks[i]->getLevel() < 0) {
+						delete menu_blocks[i];
+						menu_blocks.erase(menu_blocks.begin() + i);
+
+						// recreate a block to replace the old one
+						int max_x = window->getSize().x;
+						int max_y = window->getSize().y;
+						int speed = random(0.5, 2);
+						int length = (int)random(20, 50);
+						menu_blocks.push_back(new Block((int)random(length + 1, max_x - length - 1), (int)random(length / 2 + 1, max_y - length / 2 - 1), length, length / 2, (int)random(5)));
+						break; // only one colision considered
+					}
+				}
 			}
 		}
 		break;
@@ -287,6 +310,10 @@ void GameManager::render() {
 	// render all the objects
 	switch (state) {
 	case 1:
+		// randomly placed blocks
+		for (Block* b : menu_blocks) {
+			b->render(renderer);
+		}
 		// nice looking bouncing balls
 		for (Ball* b : menu_balls) {
 			b->render(renderer);
