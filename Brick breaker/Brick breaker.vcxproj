@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup Label="ProjectConfigurations">
     <ProjectConfiguration Include="Debug|Win32">
@@ -140,11 +140,13 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="Ball.cpp" />
+    <ClCompile Include="Button.cpp" />
     <ClCompile Include="Collidable.cpp" />
     <ClCompile Include="DrawUtil.cpp" />
     <ClCompile Include="GameManager.cpp" />
     <ClCompile Include="Keyboardcpp.cpp" />
     <ClCompile Include="Label.cpp" />
+    <ClCompile Include="LabeledButton.cpp" />
     <ClCompile Include="Main.cpp" />
     <ClCompile Include="Block.cpp" />
     <ClCompile Include="Pusher.cpp" />
@@ -155,11 +157,13 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Ball.h" />
+    <ClInclude Include="Button.h" />
     <ClInclude Include="Collidable.h" />
     <ClInclude Include="Colors.h" />
     <ClInclude Include="DrawUtil.h" />
     <ClInclude Include="Block.h" />
     <ClInclude Include="GameManager.h" />
+    <ClInclude Include="LabeledButton.h" />
     <ClInclude Include="Keyboard.h" />
     <ClInclude Include="Label.h" />
     <ClInclude Include="Pusher.h" />

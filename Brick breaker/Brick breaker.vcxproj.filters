@@ -19,6 +19,9 @@
     <Filter Include="Source Files\utils">
       <UniqueIdentifier>{04f3d409-8b62-4bf6-8990-aa06a591398d}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source Files\UIcomponents">
+      <UniqueIdentifier>{9b8bf963-20b9-4ba0-b0c0-1cf38ae77ac3}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Main.cpp">
@@ -49,7 +52,13 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Label.cpp">
-      <Filter>Source Files\objects</Filter>
+      <Filter>Source Files\UIcomponents</Filter>
+    </ClCompile>
+    <ClCompile Include="Button.cpp">
+      <Filter>Source Files\UIcomponents</Filter>
+    </ClCompile>
+    <ClCompile Include="LabeledButton.cpp">
+      <Filter>Source Files\UIcomponents</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -84,7 +93,13 @@
       <Filter>Source Files</Filter>
     </ClInclude>
     <ClInclude Include="Label.h">
-      <Filter>Source Files\objects</Filter>
+      <Filter>Source Files\UIcomponents</Filter>
+    </ClInclude>
+    <ClInclude Include="Button.h">
+      <Filter>Source Files\UIcomponents</Filter>
+    </ClInclude>
+    <ClInclude Include="LabeledButton.h">
+      <Filter>Source Files\UIcomponents</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

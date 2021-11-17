@@ -4,11 +4,12 @@
 #include <SDL_ttf.h>
 
 class Label {
-private :
+protected :
 	SDL_Rect source;
 	SDL_Rect destination;
 	SDL_Texture* texture;
 public :
+	Label() {};
 	Label(const char* text, int x, int y, TTF_Font* font, SDL_Color color, SDL_Renderer* renderer);
 	~Label();
 

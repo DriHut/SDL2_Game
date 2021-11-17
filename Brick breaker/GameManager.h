@@ -8,6 +8,7 @@
 #include "Ball.h"
 #include "Keyboard.h"
 #include "Label.h"
+#include "LabeledButton.h"
 
 using std::vector;
 
@@ -32,15 +33,20 @@ private:
 	Ball* ball = nullptr; // main ball
 	vector<Block*> blocks; // blocks list
 	SDL_Point cursor;
-
-	// Labels
+	
+	// Fonts
 	TTF_Font* font64 = nullptr;
 	TTF_Font* font32 = nullptr;
+
+	// Labels
 	vector<Label*> title_label;
 	Label* pause_label = nullptr;
 	Label* pause_info = nullptr;
 	Label* lost_label = nullptr;
 	Label* win_label = nullptr;
+
+	// Buttons
+	LabeledButton* play_button = nullptr;
 
 	// menu graphics
 	vector<Ball*> menu_balls; // menu balls

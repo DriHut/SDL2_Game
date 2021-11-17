@@ -27,10 +27,15 @@ GameManager::GameManager(const char* title, int width, int height, SDL_Color bac
 
 GameManager::~GameManager() {
 	clear();
-	delete window, keyboard, pusher, ball, font64, pause_label;
+	delete window, keyboard, pusher, ball, font64, font32, pause_label, pause_info, lost_label, win_label;
 }
 
 void GameManager::init(int pusher_size, int ball_radius, SDL_Color main_color) {
+
+	// general block size parameters
+	block_Size.x = 50;
+	block_Size.y = 25;
+
 	// set pusher
 	pusher = new Pusher(
 		(window->getSize().x - 50) * 0.5, // x pos
@@ -51,10 +56,10 @@ void GameManager::init(int pusher_size, int ball_radius, SDL_Color main_color) {
 		main_color                 // color white
 	);
 
-	// create cool looking ball menu
 	int max_x = window->getSize().x;
 	int max_y = window->getSize().y;
 
+	// create cool looking ball menu
 	float speed;
 	int radius;
 	for (int i = 0; i < 15; i++) {
@@ -70,10 +75,6 @@ void GameManager::init(int pusher_size, int ball_radius, SDL_Color main_color) {
 		menu_blocks.push_back(new Block((int)random(length + 1, max_x - length - 1), (int)random(length / 2 + 1, max_y - length / 2 - 1), length, length / 2, (int)random(5)));
 	}
 
-	// general block size parameters
-	block_Size.x = 50;
-	block_Size.y = 25;
-
 	font64 = TTF_OpenFont("assets/fonts/playmegames-reguler.ttf", 64);
 	font32 = TTF_OpenFont("assets/fonts/playmegames-reguler.ttf", 32);
 	if (!font64 && !font32) {
@@ -88,7 +89,7 @@ void GameManager::init(int pusher_size, int ball_radius, SDL_Color main_color) {
 	pause_info = new Label("Press <p> to unpause", window->getSize().x - 300, window->getSize().y - 40, font32, { 255,255,255,255 }, window->getRenderer());
 
 	lost_label = new Label("You Lost", 500, window->getSize().y / 2 + 100, font64, { 255,255,255,255 }, window->getRenderer());
-	win_label  = new Label("You Win",  500, window->getSize().y / 2 + 100, font64, { 255,255,255,255 }, window->getRenderer());
+	win_label  = new Label("You Win",  530, window->getSize().y / 2 + 100, font64, { 255,255,255,255 }, window->getRenderer());
 
 	// create a title using a font that will get unloaded
 	TTF_Font* temp_font = TTF_OpenFont("assets/fonts/playmegames-reguler.ttf", 256);
@@ -97,14 +98,30 @@ void GameManager::init(int pusher_size, int ball_radius, SDL_Color main_color) {
 	title_label.push_back( new Label("B", 150, 100, temp_font, { 204,204,0,255 }, window->getRenderer()) );
 	title_label.push_back( new Label("B", 250, 300, temp_font, { 204,0,0,255 }, window->getRenderer()) );
 	TTF_CloseFont(temp_font);
+
+	// create menu buttons
+	play_button = new LabeledButton("Play", 450, window->getSize().y / 2 + 150, font64, { 255,255,255,255 }, { 204,0,0,255 }, window->getRenderer());
+
 }
 
 void GameManager::clear() {
+	// clear all the blocks
 	clearBlocks();
+	// clear the title
 	for (Label* label : title_label) {
 		delete label;
 	}
 	title_label.clear();
+	// clear the menu balls
+	for (Ball* ball : menu_balls) {
+		delete ball;
+	}
+	menu_balls.clear();
+	// clear the menu blocks
+	for (Block* block : menu_blocks) {
+		delete block;
+	}
+	menu_blocks.clear();
 }
 
 void GameManager::clearBlocks() {
@@ -127,7 +144,10 @@ void GameManager::loadLevel(int level) {
 	clearBlocks();
 
 	switch (level) {
-	case 1: // level 1
+	case 1:
+		blocks.push_back(new Block((window->getSize().x - block_Size.x) * 0.5, (window->getSize().y - block_Size.y) * 0.5, block_Size.x, block_Size.y, 0));
+		break;
+	case 2: // level 3
 
 		// make a group of block with an increasing level
 		for (int j = 0; j < 7; j++) {
@@ -171,14 +191,21 @@ void GameManager::handleEvents() {
 		if (event.button.button == SDL_BUTTON_LEFT) {
 			switch (state) {
 			case 1:
-				std::cout << "Game started ! ..." << std::endl;
-				loadLevel(level);
-				state++; // exit the waiting menu state
+				if (play_button->isHovered(cursor)) {
+					std::cout << "Game started ! ..." << std::endl;
+					loadLevel(level);
+					state = 2; // exit the waiting menu state
+				}
 				break;
 			case 3:
 				std::cout << "Game restarted ! ..." << std::endl;
 				loadLevel(level);
 				state = 1; // restart to the waiting menu
+				break;
+			case 4:
+				std::cout << "Game continued ! ..." << std::endl;
+				loadLevel(level+1);
+				state = 2; // restart to the waiting menu
 				break;
 			}
 		}
@@ -189,7 +216,7 @@ void GameManager::handleEvents() {
 		if (event.key.keysym.sym > 0 && event.key.keysym.sym < 322)
 			keyboard->updateKey(event.key.keysym.sym, event.key.state);
 		break;
-	case SDL_MOUSEWHEEL:
+	case SDL_MOUSEWHEEL: // speed customizer
 		if (!paused) {
 			pusher->setSpeed(pusher->getSpeed() + event.wheel.y * 0.1);
 		}
@@ -198,10 +225,19 @@ void GameManager::handleEvents() {
 }
 
 void GameManager::update() {
+	// determine cursor position
+	int x, y;
+	SDL_GetGlobalMouseState(&cursor.x, &cursor.y);
+	SDL_GetWindowPosition(window->getWindow(), &x, &y);
+
+	// normalize cursor position relatively to the window
+	cursor.x -= x;
+	cursor.y -= y;
 
 	switch (state) {
 	case 1:// in the menu
-
+		// update button graphics
+		play_button->isHovered(cursor);
 		// funny graphics in the background
 		for (Ball* b : menu_balls) {
 			b->move(); // move ball
@@ -224,6 +260,7 @@ void GameManager::update() {
 			}
 		}
 		break;
+
 	case 2: // running state
 		if (blocks.size() == 0) {
 			state = 4; // really quick way to detect victory state
@@ -256,13 +293,6 @@ void GameManager::update() {
 				pusher->getY() - 0.5 * pusher->getHeight() - ball->getRadius()
 			);
 			// determine throwing direction (unfinished)
-			int x, y;
-			SDL_GetGlobalMouseState(&cursor.x, &cursor.y);
-			SDL_GetWindowPosition(window->getWindow(), &x, &y);
-
-			// normalize cursor position relatively to the window
-			cursor.x -= x;
-			cursor.y -= y;
 
 			// get vectors
 			int  vect_x;
@@ -322,6 +352,8 @@ void GameManager::render() {
 		for (Label* label : title_label) {
 			label->render(renderer);
 		}
+		// render button
+		play_button->render(renderer);
 		break;
 	case 4:
 	case 3: // win or lose cases
