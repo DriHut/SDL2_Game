@@ -2,7 +2,7 @@
 
 #include "Collidable.h"
 
-class Block : public Collidable {
+class Block : public Collidable, public Renderable {
 private :
 	int level;
 public:

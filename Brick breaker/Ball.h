@@ -1,8 +1,9 @@
 #pragma once
 
 #include <SDL.h>
+#include "Renderable.h"
 
-class Ball {
+class Ball : public Renderable {
 private: 
 	float pos_x; // store x coordinate
 	float pos_y; // store y coordinate
@@ -15,7 +16,7 @@ private:
 	float vec_y; // stores y between -1 and 1;
 
 	SDL_Color color; // ball color
-	bool is_thrown = false; // get if ball has been launched 
+	bool is_thrown = false; // get if ball has been launched
 public:
 	Ball(float x, float y, int radius, float vector_x, float speed, SDL_Color ball_color);
 	~Ball();

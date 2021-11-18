@@ -63,6 +63,12 @@
     <ClCompile Include="LabelButton.cpp">
       <Filter>Source Files\UIcomponents</Filter>
     </ClCompile>
+    <ClCompile Include="PageObj.cpp">
+      <Filter>Source Files\Windows</Filter>
+    </ClCompile>
+    <ClCompile Include="Random.cpp">
+      <Filter>Source Files\utils</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
@@ -109,6 +115,12 @@
     </ClInclude>
     <ClInclude Include="Menu.h">
       <Filter>Source Files\Windows</Filter>
+    </ClInclude>
+    <ClInclude Include="Random.h">
+      <Filter>Source Files\utils</Filter>
+    </ClInclude>
+    <ClInclude Include="Renderable.h">
+      <Filter>Source Files\utils</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

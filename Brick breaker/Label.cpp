@@ -27,11 +27,5 @@ void Label::setTexture(const char* text, TTF_Font* font, SDL_Color color, SDL_Re
 }
 
 void Label::render(SDL_Renderer* renderer) {
-	if (is_visible) {
-		SDL_RenderCopy(renderer, texture, &source, &destination);
-	}
-}
-
-void Label::setVisible(bool is_visible) {
-	this->is_visible = is_visible;
+	SDL_RenderCopy(renderer, texture, &source, &destination);
 }

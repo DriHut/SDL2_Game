@@ -1,8 +1,5 @@
 #include "GameManager.h"
 
-#include <stdlib.h>
-#include <time.h>
-#include <stdio.h>
 #include <SDL_image.h>
 #include <iostream>
 #include "DrawUtil.h"

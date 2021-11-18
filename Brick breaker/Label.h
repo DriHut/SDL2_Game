@@ -2,13 +2,13 @@
 
 #include <SDL.h>
 #include <SDL_ttf.h>
+#include "Renderable.h"
 
-class Label {
+class Label: public Renderable {
 protected :
 	SDL_Rect source;
 	SDL_Rect destination;
 	SDL_Texture* texture;
-	bool is_visible = true;
 public :
 	Label() {};
 	Label(const char* text, int x, int y, TTF_Font* font, SDL_Color color, SDL_Renderer* renderer);
@@ -16,7 +16,4 @@ public :
 
 	void setTexture(const char* text, TTF_Font* font, SDL_Color color, SDL_Renderer* renderer);
 	void render(SDL_Renderer* renderer);
-
-	void setVisible(bool is_visible);
-	bool isVisible() { return is_visible; };
 };

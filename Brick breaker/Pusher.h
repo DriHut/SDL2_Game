@@ -2,7 +2,7 @@
 
 #include "Collidable.h"
 
-class Pusher : public Collidable {
+class Pusher : public Collidable, public Renderable {
 private :
 	SDL_Color color;
 	float speed;

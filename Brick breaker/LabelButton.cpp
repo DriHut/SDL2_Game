@@ -22,12 +22,15 @@ void LabelButton::setHoverTexture(const char* text, TTF_Font* font, SDL_Color co
 }
 
 void LabelButton::render(SDL_Renderer* renderer) {
-	if (is_visible) {
-		if (is_hovered) {
-			SDL_RenderCopy(renderer, texture_hover, &source, &destination);
-		}
-		else {
-			SDL_RenderCopy(renderer, texture, &source, &destination);
-		}
+	if (is_hovered) {
+		SDL_RenderCopy(renderer, texture_hover, &source, &destination);
+	} else {
+		SDL_RenderCopy(renderer, texture, &source, &destination);
+	}
+}
+
+void LabelButton::execute() {
+	for (std::function<void()> f : executables) {
+
 	}
 }
