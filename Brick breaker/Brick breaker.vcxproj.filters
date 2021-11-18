@@ -22,6 +22,9 @@
     <Filter Include="Source Files\UIcomponents">
       <UniqueIdentifier>{9b8bf963-20b9-4ba0-b0c0-1cf38ae77ac3}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source Files\Windows">
+      <UniqueIdentifier>{27c724fc-98d7-4971-b29e-b5671b75504c}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Main.cpp">
@@ -57,7 +60,7 @@
     <ClCompile Include="Button.cpp">
       <Filter>Source Files\UIcomponents</Filter>
     </ClCompile>
-    <ClCompile Include="LabeledButton.cpp">
+    <ClCompile Include="LabelButton.cpp">
       <Filter>Source Files\UIcomponents</Filter>
     </ClCompile>
   </ItemGroup>
@@ -98,8 +101,14 @@
     <ClInclude Include="Button.h">
       <Filter>Source Files\UIcomponents</Filter>
     </ClInclude>
-    <ClInclude Include="LabeledButton.h">
+    <ClInclude Include="LabelButton.h">
       <Filter>Source Files\UIcomponents</Filter>
+    </ClInclude>
+    <ClInclude Include="PageObj.h">
+      <Filter>Source Files\Windows</Filter>
+    </ClInclude>
+    <ClInclude Include="Menu.h">
+      <Filter>Source Files\Windows</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

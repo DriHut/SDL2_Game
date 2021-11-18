@@ -146,7 +146,7 @@
     <ClCompile Include="GameManager.cpp" />
     <ClCompile Include="Keyboardcpp.cpp" />
     <ClCompile Include="Label.cpp" />
-    <ClCompile Include="LabeledButton.cpp" />
+    <ClCompile Include="LabelButton.cpp" />
     <ClCompile Include="Main.cpp" />
     <ClCompile Include="Block.cpp" />
     <ClCompile Include="Pusher.cpp" />
@@ -163,9 +163,11 @@
     <ClInclude Include="DrawUtil.h" />
     <ClInclude Include="Block.h" />
     <ClInclude Include="GameManager.h" />
-    <ClInclude Include="LabeledButton.h" />
+    <ClInclude Include="LabelButton.h" />
     <ClInclude Include="Keyboard.h" />
     <ClInclude Include="Label.h" />
+    <ClInclude Include="Menu.h" />
+    <ClInclude Include="PageObj.h" />
     <ClInclude Include="Pusher.h" />
     <ClInclude Include="Window.h" />
   </ItemGroup>

@@ -60,14 +60,15 @@ SDL_Color Ball::getColor() {
 
 void Ball::bounce(int angle) {
 	switch (angle) {
-	case 0:
-		vec_x *= -1;
-		break;
-	case 1:
-		vec_y *= -1;
-		break;
-	default:
-		break;
+		case 0:
+			vec_x *= -1;
+			break;
+		case 1:
+			vec_y *= -1;
+			break;
+		case 2:
+			vec_x *= -1;
+			vec_y *= -1;
 	}
 }
 

@@ -17,3 +17,7 @@ bool Button::isHovered(SDL_Point cursor) {
 	}
 	return is_hovered;
 }
+
+void Button::setActive(bool is_active) {
+	this->is_active = is_active;
+}

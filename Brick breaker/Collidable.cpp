@@ -37,8 +37,9 @@ int Collidable::collide(int pos_x, int pos_y, int radius) {
 
 	// if the distance is less than the radius, collision!
 	if (distance <= radius) {
-		if (distX != 0) return 1;
-		if (distY != 0) return 2;
+		if (distX != 0 && (distY < distX || distY == 0)) return 1;
+		if (distY != 0 && (distX < distY || distX == 0)) return 2;
+		return 3;
 	}
 	return false;
 }

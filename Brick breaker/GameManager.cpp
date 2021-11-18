@@ -21,6 +21,12 @@ GameManager::GameManager(const char* title, int width, int height, SDL_Color bac
 			SDL_WINDOW_SHOWN,       // tags
 			background_color        // color
 		);
+
+		// set window icon
+		SDL_Surface* icon = IMG_Load("assets/Brick_Breaker_icon.png");
+		SDL_SetWindowIcon(window->getWindow(), icon);
+		SDL_FreeSurface(icon);
+
 		keyboard = new Keyboard();
 	}
 }
@@ -100,7 +106,8 @@ void GameManager::init(int pusher_size, int ball_radius, SDL_Color main_color) {
 	TTF_CloseFont(temp_font);
 
 	// create menu buttons
-	play_button = new LabeledButton("Play", 450, window->getSize().y / 2 + 150, font64, { 255,255,255,255 }, { 204,0,0,255 }, window->getRenderer());
+	play_button = new LabelButton("Play", 400, window->getSize().y / 2 + 180, font64, { 255,255,255,255 }, { 0,204,0,255 }, window->getRenderer());
+	quit_button = new LabelButton("Quit", 750, window->getSize().y / 2 + 180, font64, { 255,255,255,255 }, { 204,0,0,255 }, window->getRenderer());
 
 }
 
@@ -157,16 +164,6 @@ void GameManager::loadLevel(int level) {
 		}
 		break;
 	}
-	
-	// set blocks
-	/*block = new Block(
-		(window->getPos().x - block_Size.x) * 0.5, // x pos
-		(window->getPos().y - block_Size.y) * 0.5, // y pos
-		block_Size.x,                              // width
-		block_Size.y,                              // height
-		5                                // hardness / level
-	);
-	blocks.push_back(block);*/
 }
 
 void GameManager::collide(Ball* ball) {
@@ -191,10 +188,14 @@ void GameManager::handleEvents() {
 		if (event.button.button == SDL_BUTTON_LEFT) {
 			switch (state) {
 			case 1:
-				if (play_button->isHovered(cursor)) {
+				if (play_button->isHovered()) {
 					std::cout << "Game started ! ..." << std::endl;
 					loadLevel(level);
 					state = 2; // exit the waiting menu state
+				}
+				if (quit_button->isHovered()) {
+					std::cout << "Stopping ! ..." << std::endl;
+					is_running = false;
 				}
 				break;
 			case 3:
@@ -238,6 +239,7 @@ void GameManager::update() {
 	case 1:// in the menu
 		// update button graphics
 		play_button->isHovered(cursor);
+		quit_button->isHovered(cursor);
 		// funny graphics in the background
 		for (Ball* b : menu_balls) {
 			b->move(); // move ball
@@ -313,8 +315,8 @@ void GameManager::update() {
 			}
 
 			// factor to render a line that is long enough
-			cursor.x = ball->getX() + vect_x * (speed * 80 / length);
-			cursor.y = ball->getY() + vect_y * (speed * 80 / length);
+			aim.x = ball->getX() + vect_x * (speed * 80 / length);
+			aim.y = ball->getY() + vect_y * (speed * 80 / length);
 		}
 		break;
 	}
@@ -354,6 +356,7 @@ void GameManager::render() {
 		}
 		// render button
 		play_button->render(renderer);
+		quit_button->render(renderer);
 		break;
 	case 4:
 	case 3: // win or lose cases
@@ -371,7 +374,7 @@ void GameManager::render() {
 		if (!ball->isThrown()) {
 			SDL_SetRenderDrawColor(renderer, 120, 120, 120, 255); // reset background everytime
 			
-			SDL_RenderDrawLine(renderer, ball->getX(), ball->getY(), cursor.x, cursor.y);
+			SDL_RenderDrawLine(renderer, ball->getX(), ball->getY(), aim.x, aim.y);
 		}
 		ball->render(renderer);
 
