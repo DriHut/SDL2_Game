@@ -30,7 +30,7 @@ GameManager::GameManager(const char* title, int width, int height, SDL_Color bac
 
 GameManager::~GameManager() {
 	clear();
-	delete window, keyboard, pusher, ball, font64, font32, pause_label, pause_info, lost_label, win_label;
+	delete window, keyboard, pusher, ball, font64, font32, pause_label, pause_info, lost_label, win_label, play_button, quit_button, parameter_button;
 }
 
 void GameManager::init(int pusher_size, int ball_radius, SDL_Color main_color) {
@@ -104,8 +104,20 @@ void GameManager::init(int pusher_size, int ball_radius, SDL_Color main_color) {
 
 	// create menu buttons
 	play_button = new LabelButton("Play", 400, window->getSize().y / 2 + 180, font64, { 255,255,255,255 }, { 0,204,0,255 }, window->getRenderer());
+	play_button->registerCallback([this]() {
+			std::cout << "Game started ! ..." << std::endl;
+			loadLevel(level);
+			state = 2; // exit the waiting menu state
+		});
 	quit_button = new LabelButton("Quit", 750, window->getSize().y / 2 + 180, font64, { 255,255,255,255 }, { 204,0,0,255 }, window->getRenderer());
+	quit_button->registerCallback([this] {
+			std::cout << "Stopping ! ..." << std::endl;
+			is_running = false;
+		});
 
+	SDL_Surface* param_icon = IMG_Load("assets/sprites/parameter.png");
+	parameter_button = new IconButton(param_icon, 8, 8, { 255,255,255 }, { 120,120,120 }, window->getRenderer(), 0.3);
+	SDL_FreeSurface(param_icon);
 }
 
 void GameManager::clear() {
@@ -186,13 +198,13 @@ void GameManager::handleEvents() {
 			switch (state) {
 			case 1:
 				if (play_button->isHovered()) {
-					std::cout << "Game started ! ..." << std::endl;
-					loadLevel(level);
-					state = 2; // exit the waiting menu state
+					play_button->execute();
 				}
-				if (quit_button->isHovered()) {
-					std::cout << "Stopping ! ..." << std::endl;
-					is_running = false;
+				else if (quit_button->isHovered()) {
+					quit_button->execute();
+				}
+				else if (parameter_button->isHovered()) {
+
 				}
 				break;
 			case 3:
@@ -237,6 +249,7 @@ void GameManager::update() {
 		// update button graphics
 		play_button->isHovered(cursor);
 		quit_button->isHovered(cursor);
+		parameter_button->isHovered(cursor);
 		// funny graphics in the background
 		for (Ball* b : menu_balls) {
 			b->move(); // move ball
@@ -354,6 +367,7 @@ void GameManager::render() {
 		// render button
 		play_button->render(renderer);
 		quit_button->render(renderer);
+		parameter_button->render(renderer);
 		break;
 	case 4:
 	case 3: // win or lose cases

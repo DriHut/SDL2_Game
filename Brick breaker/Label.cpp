@@ -1,14 +1,16 @@
 #include "Label.h"
 
-Label::Label(const char* text, int x, int y, TTF_Font* font, SDL_Color color, SDL_Renderer* renderer) {
+Label::Label(const char* text, int x, int y, TTF_Font* font, SDL_Color color, SDL_Renderer* renderer, float scale) {
 	destination.x = x;
 	destination.y = y;
-	setTexture(text, font, color, renderer);
+	setTexture(text, font, color, renderer, scale);
 }
 
-Label::~Label() {}
+Label::~Label() {
+	// delete texture;
+}
 
-void Label::setTexture(const char* text, TTF_Font* font, SDL_Color color, SDL_Renderer* renderer) {
+void Label::setTexture(const char* text, TTF_Font* font, SDL_Color color, SDL_Renderer* renderer, float scale) {
 	SDL_DestroyTexture(texture);
 	SDL_Surface* tmp = TTF_RenderText_Blended(font, text, color);
 	texture = SDL_CreateTextureFromSurface(renderer, tmp);
@@ -20,8 +22,8 @@ void Label::setTexture(const char* text, TTF_Font* font, SDL_Color color, SDL_Re
 	source.h = tmp->h;
 	
 	// set destination box coordinate
-	destination.w = source.w;
-	destination.h = source.h;
+	destination.w = source.w * scale;
+	destination.h = source.h * scale;
 
 	SDL_FreeSurface(tmp);
 }

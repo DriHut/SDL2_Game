@@ -33,9 +33,6 @@
     <ClCompile Include="Ball.cpp">
       <Filter>Source Files\objects</Filter>
     </ClCompile>
-    <ClCompile Include="DrawUtil.cpp">
-      <Filter>Source Files\utils</Filter>
-    </ClCompile>
     <ClCompile Include="Window.cpp">
       <Filter>Source Files\utils</Filter>
     </ClCompile>
@@ -69,6 +66,12 @@
     <ClCompile Include="Random.cpp">
       <Filter>Source Files\utils</Filter>
     </ClCompile>
+    <ClCompile Include="IconButton.cpp">
+      <Filter>Source Files\UIcomponents</Filter>
+    </ClCompile>
+    <ClCompile Include="DrawUtil.cpp">
+      <Filter>Source Files\UIcomponents</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
@@ -76,9 +79,6 @@
   <ItemGroup>
     <ClInclude Include="Ball.h">
       <Filter>Source Files\objects</Filter>
-    </ClInclude>
-    <ClInclude Include="DrawUtil.h">
-      <Filter>Source Files\utils</Filter>
     </ClInclude>
     <ClInclude Include="Window.h">
       <Filter>Source Files\utils</Filter>
@@ -120,7 +120,29 @@
       <Filter>Source Files\utils</Filter>
     </ClInclude>
     <ClInclude Include="Renderable.h">
-      <Filter>Source Files\utils</Filter>
+      <Filter>Source Files\UIcomponents</Filter>
     </ClInclude>
+    <ClInclude Include="DrawUtil.h">
+      <Filter>Source Files\UIcomponents</Filter>
+    </ClInclude>
+    <ClInclude Include="UIComponent.h">
+      <Filter>Source Files\UIcomponents</Filter>
+    </ClInclude>
+    <ClInclude Include="IconButton.h">
+      <Filter>Source Files\UIcomponents</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="assets\Brick_Breaker_icon.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="assets\sprites\parameter.jpg">
+      <Filter>Resource Files</Filter>
+    </Image>
+  </ItemGroup>
+  <ItemGroup>
+    <Font Include="assets\fonts\playmegames-reguler.ttf">
+      <Filter>Resource Files</Filter>
+    </Font>
   </ItemGroup>
 </Project>

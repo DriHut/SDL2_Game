@@ -9,6 +9,7 @@
 #include "Keyboard.h"
 #include "Label.h"
 #include "LabelButton.h"
+#include "IconButton.h"
 
 using std::vector;
 
@@ -49,6 +50,7 @@ private:
 	// Buttons
 	LabelButton* play_button = nullptr;
 	LabelButton* quit_button = nullptr;
+	IconButton* parameter_button = nullptr;
 
 	// menu graphics
 	vector<Ball*> menu_balls; // menu balls

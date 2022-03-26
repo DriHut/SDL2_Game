@@ -1,4 +1,5 @@
 #include "DrawUtil.h"
+#include <iostream>
 
 int DrawUtil::SDL_RenderFillCircle(SDL_Renderer* renderer, int x, int y, int radius) {
 	int offsetx, offsety, d;
